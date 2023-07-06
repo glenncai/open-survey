@@ -1,0 +1,43 @@
+.container {
+  min-height: calc(100vh - 64px - 65px);
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.formContainer {
+  width: 90%;
+  max-width: 450px;
+  border-radius: 8px;
+  position: relative;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+
+  h2 {
+    text-align: center;
+  }
+
+  .remember {
+    text-align: left;
+  }
+
+  .buttonContainer {
+    text-align: center;
+    width: 100%;
+    user-select: none;
+
+    button {
+      width: 100%;
+    }
+
+    a {
+      color: #71717A;
+
+      &:hover {
+        color: #9a9a9c;
+      }
+    }
+  }
+}

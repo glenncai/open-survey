@@ -1,17 +1,28 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import styles from './common.module.scss';
 import { Typography, Empty } from 'antd';
 import SurveyCard from '@/components/SurveyCard/SurveyCard.tsx';
-import ListPagination from '@/components/ListPagination/ListPagination.tsx';
 import ListSearch from '@/components/ListSearch/ListSearch.tsx';
 import Loading from '@/components/Loading/Loading.tsx';
-import useLoadSurveyListData from '@/hooks/useLoadSurveyListData.ts';
+import useLoadMoreSurveyListData from '@/hooks/useLoadMoreSurveyListData.ts';
 
 const { Title } = Typography;
 
 const List: FC = () => {
-  const { data = {}, loading } = useLoadSurveyListData({});
-  const { list: surveyList = [], total = 0 } = data;
+  const { containerRef, startLoading, surveyList, surveyListTotal, isMoreSurveyListData, loading } =
+    useLoadMoreSurveyListData({});
+
+  const LoadMoreElement = useMemo(() => {
+    if (!startLoading || loading) {
+      return <Loading />;
+    }
+    if (surveyListTotal === 0) {
+      return <Empty description="No survey" />;
+    }
+    if (!isMoreSurveyListData) {
+      return <span>No more survey</span>;
+    }
+  }, [isMoreSurveyListData, loading, startLoading, surveyListTotal]);
 
   return (
     <>
@@ -24,14 +35,11 @@ const List: FC = () => {
         </div>
       </div>
       <div className={styles.content}>
-        {loading && <Loading />}
-        {!loading && surveyList.length === 0 && <Empty description="No survey" />}
-        {!loading &&
-          surveyList.length > 0 &&
+        {surveyList.length > 0 &&
           surveyList.map((survey: any) => <SurveyCard key={survey._id} {...survey} />)}
       </div>
       <div className={styles.footer}>
-        <ListPagination total={total} />
+        <div ref={containerRef}>{LoadMoreElement}</div>
       </div>
     </>
   );

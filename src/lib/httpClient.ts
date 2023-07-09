@@ -1,15 +1,6 @@
 import axios from 'axios';
 import { message } from 'antd';
-
-export type HttpResDataType = {
-  [key: string]: any;
-};
-
-export type HttpResType<T = HttpResDataType> = {
-  errno: number;
-  data?: T;
-  msg?: string;
-};
+import { HttpResType } from '@/types/http.ts';
 
 const httpClient = axios.create({
   timeout: 10 * 1000,

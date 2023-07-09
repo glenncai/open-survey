@@ -1,13 +1,7 @@
-import httpClient, { HttpResDataType } from '@/lib/httpClient.ts';
+import httpClient from '@/lib/httpClient.ts';
 import { API_PREFIX } from '@/constants/index.tsx';
-
-type SurveySearchType = {
-  keyword: string;
-  isStarred: boolean;
-  isDeleted: boolean;
-  page: number;
-  pageSize: number;
-};
+import { HttpResDataType } from '@/types/http.ts';
+import { SurveySearchType } from '@/types/survey.ts';
 
 export const getSurveyService = async (id: string): Promise<HttpResDataType> => {
   return (await httpClient.get(`${API_PREFIX}/survey/${id}`)) as HttpResDataType;

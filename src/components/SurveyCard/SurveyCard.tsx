@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import styles from './SurveyCard.module.scss';
 import { useNavigate, Link } from 'react-router-dom';
 import { SURVEY_EDIT_PATHNAME, SURVEY_STAT_PATHNAME } from '@/constants/index.tsx';
@@ -14,6 +14,8 @@ import {
   MinusCircleOutlined,
   QuestionCircleOutlined,
 } from '@ant-design/icons';
+import { updateSurveyService, duplicateSurveyService } from '@/services/survey.ts';
+import { useRequest } from 'ahooks';
 
 type SurveyCardType = {
   _id: string;
@@ -25,20 +27,60 @@ type SurveyCardType = {
 };
 
 const SurveyCard: FC<SurveyCardType> = props => {
+  const { _id, title, isPublished, isStarred, answeredCount, createdAt } = props;
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
-  const { _id, title, isPublished, isStarred, answeredCount, createdAt } = props;
+  const [isStarredState, setIsStarredState] = useState(isStarred);
+  const [isDeletedState, setIsDeletedState] = useState(false);
 
-  function handleDuplicate() {
-    messageApi.success('Create survey successfully').then(() => {
-      console.log('Duplicate confirmed');
-    });
+  // Update star state
+  const { run: runUpdateStarState, loading: starStateLoading } = useRequest(callUpdateStarService, {
+    manual: true,
+    onSuccess: () => {
+      setIsStarredState(!isStarredState);
+      messageApi.success('Update survey successfully');
+    },
+  });
+
+  // Duplicate survey operation
+  const { run: runDuplicateSurvey, loading: duplicateStateLoading } = useRequest(
+    callDuplicateSurveyService,
+    {
+      manual: true,
+      onSuccess: result => {
+        messageApi.success('Duplicate survey successfully').then(() => {
+          navigate(`/survey/edit/${result.id}`);
+        });
+      },
+    }
+  );
+
+  // Delete survey operation
+  const { run: runUpdateDeleteState, loading: deleteStateLoading } = useRequest(
+    callDeleteSurveyService,
+    {
+      manual: true,
+      onSuccess: () => {
+        setIsDeletedState(true);
+        messageApi.success('Delete survey successfully');
+      },
+    }
+  );
+
+  async function callUpdateStarService() {
+    await updateSurveyService(_id, { isStarred: !isStarredState });
   }
 
-  function handleDelete() {
-    messageApi.success('Deleted survey successfully').then(() => {
-      console.log('Delete confirmed');
-    });
+  async function callDuplicateSurveyService() {
+    return await duplicateSurveyService(_id);
+  }
+
+  async function callDeleteSurveyService() {
+    await updateSurveyService(_id, { isDeleted: true });
+  }
+
+  if (isDeletedState) {
+    return null;
   }
 
   return (
@@ -97,7 +139,7 @@ const SurveyCard: FC<SurveyCardType> = props => {
           <Space>
             <Button
               icon={
-                isStarred ? (
+                isStarredState ? (
                   <StarFilled className={styles.starColor} />
                 ) : (
                   <StarOutlined className={styles.starColor} />
@@ -105,17 +147,24 @@ const SurveyCard: FC<SurveyCardType> = props => {
               }
               type="text"
               size="small"
+              onClick={runUpdateStarState}
+              disabled={starStateLoading}
             >
-              {isStarred ? 'Unstar' : 'Star'}
+              {isStarredState ? 'Unstar' : 'Star'}
             </Button>
             <Popconfirm
               title="Duplicate the survey"
               description="Are you sure to duplicate this survey?"
               cancelText="Cancel"
               okText="Confirm"
-              onConfirm={handleDuplicate}
+              onConfirm={runDuplicateSurvey}
             >
-              <Button icon={<CopyOutlined />} type="text" size="small">
+              <Button
+                icon={<CopyOutlined />}
+                type="text"
+                size="small"
+                disabled={duplicateStateLoading}
+              >
                 Duplicate
               </Button>
             </Popconfirm>
@@ -125,9 +174,14 @@ const SurveyCard: FC<SurveyCardType> = props => {
               cancelText="Cancel"
               okText="Confirm"
               icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-              onConfirm={handleDelete}
+              onConfirm={runUpdateDeleteState}
             >
-              <Button icon={<DeleteOutlined />} type="text" size="small">
+              <Button
+                icon={<DeleteOutlined />}
+                type="text"
+                size="small"
+                disabled={deleteStateLoading}
+              >
                 Delete
               </Button>
             </Popconfirm>

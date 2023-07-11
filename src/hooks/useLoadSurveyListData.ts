@@ -26,11 +26,11 @@ const useLoadSurveyListData = (opts: Partial<SurveyOptionsType>) => {
     return await getSurveyListService({ keyword, isStarred, isDeleted, page, pageSize });
   }
 
-  const { data, loading, error } = useRequest(loadSurveyListData, {
+  const { data, loading, error, refresh } = useRequest(loadSurveyListData, {
     refreshDeps: [searchParams],
   });
 
-  return { data, loading, error };
+  return { data, loading, error, refresh };
 };
 
 export default useLoadSurveyListData;

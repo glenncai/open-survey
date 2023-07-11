@@ -1,6 +1,6 @@
 import { FC, Key, useState } from 'react';
 import styles from './common.module.scss';
-import { Typography, Empty, Table, Tag, Button, Space, Modal } from 'antd';
+import { Typography, Empty, Table, Tag, Button, Space, Modal, message } from 'antd';
 import {
   CheckCircleOutlined,
   MinusCircleOutlined,
@@ -12,14 +12,17 @@ import ListSearch from '@/components/ListSearch/ListSearch.tsx';
 import ListPagination from '@/components/ListPagination/ListPagination.tsx';
 import Loading from '@/components/Loading/Loading.tsx';
 import useLoadSurveyListData from '@/hooks/useLoadSurveyListData.ts';
+import { deleteSurveyService, updateSurveyService } from '@/services/survey.ts';
+import { useRequest } from 'ahooks';
 
 const { Title } = Typography;
 
 const Trash: FC = () => {
-  const { data = {}, loading } = useLoadSurveyListData({ isDeleted: true });
+  const { data = {}, loading, refresh } = useLoadSurveyListData({ isDeleted: true });
   const { list: surveyList = [], total = 0 } = data;
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [modal, contextHolder] = Modal.useModal();
+  const [modal, modalContextHolder] = Modal.useModal();
+  const [messageApi, messageContextHolder] = message.useMessage();
   const tableColumns = [
     {
       title: 'Title',
@@ -62,12 +65,50 @@ const Trash: FC = () => {
     },
   ];
 
+  // Restore survey operation
+  const { run: runRestoreSelectedSurvey, loading: restoreLoading } = useRequest(
+    callRestoreDeletedSurveyService,
+    {
+      manual: true,
+      onSuccess: () => {
+        messageApi.success('Restore survey successfully').then(() => {
+          refresh();
+          setSelectedIds([]);
+        });
+      },
+    }
+  );
+
+  const { run: runDeleteSelectedSurvey, loading: deleteLoading } = useRequest(
+    callDeleteSurveyService,
+    {
+      manual: true,
+      onSuccess: () => {
+        messageApi.success('Delete survey successfully').then(() => {
+          refresh();
+          setSelectedIds([]);
+        });
+      },
+    }
+  );
+
+  async function callRestoreDeletedSurveyService() {
+    for await (const id of selectedIds) {
+      await updateSurveyService(id, { isDeleted: false });
+    }
+  }
+
+  async function callDeleteSurveyService() {
+    await deleteSurveyService(selectedIds);
+  }
+
   function handleDelete() {
     modal.confirm({
       title: 'Delete survey',
       content: 'Are you sure to delete the selected survey permanently?',
       okText: 'Confirm',
       cancelText: 'Cancel',
+      onOk: runDeleteSelectedSurvey,
       icon: <QuestionCircleOutlined style={{ color: 'red' }} />,
     });
   }
@@ -75,12 +116,22 @@ const Trash: FC = () => {
   const TableElement = (
     <>
       <div className={styles.buttonContainer}>
-        {contextHolder}
+        {modalContextHolder}
+        {messageContextHolder}
         <Space>
-          <Button type="primary" disabled={selectedIds.length === 0}>
+          <Button
+            type="primary"
+            disabled={selectedIds.length === 0}
+            loading={restoreLoading}
+            onClick={runRestoreSelectedSurvey}
+          >
             Restore
           </Button>
-          <Button disabled={selectedIds.length === 0} onClick={handleDelete}>
+          <Button
+            disabled={selectedIds.length === 0}
+            loading={deleteLoading}
+            onClick={handleDelete}
+          >
             Delete
           </Button>
         </Space>

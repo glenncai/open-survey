@@ -1,10 +1,21 @@
 import axios from 'axios';
 import { message } from 'antd';
 import { HttpResType } from '@/types/http.ts';
+import { getToken } from '@/utils/index.ts';
 
 const httpClient = axios.create({
   timeout: 10 * 1000,
 });
+
+httpClient.interceptors.request.use(
+  config => {
+    config.headers['Authorization'] = `Bearer ${getToken()}`;
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  }
+);
 
 httpClient.interceptors.response.use(response => {
   const responseData = (response.data as HttpResType) || {};

@@ -39,3 +39,5 @@ export const LIST_DEFAULT_PAGE_SIZE = 10;
 export const LOGIN_USERNAME = 'open_survey_username';
 
 export const LOGIN_PASSWORD = 'open_survey_password';
+
+export const USER_TOKEN = 'open_survey_token';

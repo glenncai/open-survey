@@ -1,9 +1,17 @@
 import { FC, useEffect } from 'react';
 import styles from './common.module.scss';
-import { Link } from 'react-router-dom';
-import { Typography, Form, Input, Button, Space, Checkbox } from 'antd';
-import { REGISTER_PATHNAME, LOGIN_USERNAME, LOGIN_PASSWORD } from '@/constants/index.tsx';
+import { Link, useNavigate } from 'react-router-dom';
+import { Typography, Form, Input, Button, Space, Checkbox, message } from 'antd';
+import {
+  REGISTER_PATHNAME,
+  LOGIN_USERNAME,
+  LOGIN_PASSWORD,
+  MANAGE_LIST_PATHNAME,
+} from '@/constants/index.tsx';
 import useSecureLocalStorage from '@/hooks/useSecureLocalStorage.ts';
+import { loginService } from '@/services/user.ts';
+import { useRequest } from 'ahooks';
+import { setToken } from '@/utils/index.ts';
 
 const { Title } = Typography;
 
@@ -14,7 +22,9 @@ interface LoginFormValues {
 }
 
 const Login: FC = () => {
+  const navigate = useNavigate();
   const [form] = Form.useForm();
+  const [messageApi, contextHolder] = message.useMessage();
   const [username, setUsername] = useSecureLocalStorage(LOGIN_USERNAME, '');
   const [password, setPassword] = useSecureLocalStorage(LOGIN_PASSWORD, '');
 
@@ -26,6 +36,11 @@ const Login: FC = () => {
     }
   }, [username, password, form]);
 
+  async function handleLogin(values: LoginFormValues) {
+    const { username, password } = values;
+    return await loginService(username, password);
+  }
+
   function onFinish(values: LoginFormValues) {
     const { username, password, remember } = values || {};
 
@@ -36,11 +51,29 @@ const Login: FC = () => {
       setUsername(undefined);
       setPassword(undefined);
     }
+
+    runLogin(values);
   }
+
+  const { run: runLogin } = useRequest((values: LoginFormValues) => handleLogin(values), {
+    manual: true,
+    onSuccess(result) {
+      const { token = '' } = result;
+      messageApi
+        .success('Login successfully, redirecting to manage list page...')
+        .then(() => {
+          setToken(token);
+        })
+        .then(() => {
+          navigate(MANAGE_LIST_PATHNAME);
+        });
+    },
+  });
 
   return (
     <div className={styles.container}>
       <div className={styles.formContainer}>
+        {contextHolder}
         <Title level={2}>Welcome Back!</Title>
         <Form
           form={form}

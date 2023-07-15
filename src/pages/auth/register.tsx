@@ -1,8 +1,10 @@
 import { FC } from 'react';
 import styles from './common.module.scss';
-import { Link } from 'react-router-dom';
-import { Typography, Form, Input, Button, Space } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
+import { Typography, Form, Input, Button, Space, message } from 'antd';
 import { LOGIN_PATHNAME } from '@/constants/index.tsx';
+import { registerService } from '@/services/user.ts';
+import { useRequest } from 'ahooks';
 
 const { Title } = Typography;
 
@@ -14,13 +16,31 @@ interface RegisterFormValues {
 }
 
 const Register: FC = () => {
-  function onFinish(values: RegisterFormValues) {
-    console.log(values);
+  const navigate = useNavigate();
+  const [messageApi, contextHolder] = message.useMessage();
+
+  async function handleRegister(values: RegisterFormValues) {
+    const { username, password, nickname } = values;
+    await registerService(username, password, nickname);
   }
+
+  function onFinish(values: RegisterFormValues) {
+    runRegister(values);
+  }
+
+  const { run: runRegister } = useRequest((values: RegisterFormValues) => handleRegister(values), {
+    manual: true,
+    onSuccess() {
+      messageApi.success('Register successfully').then(() => {
+        navigate(LOGIN_PATHNAME);
+      });
+    },
+  });
 
   return (
     <div className={styles.container}>
       <div className={styles.formContainer}>
+        {contextHolder}
         <Title level={2}>Create an account</Title>
         <Form layout="vertical" autoComplete="off" onFinish={onFinish}>
           <Form.Item

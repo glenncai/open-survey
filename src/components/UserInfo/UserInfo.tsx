@@ -2,16 +2,17 @@ import styles from './UserInfo.module.scss';
 import { FC } from 'react';
 import { LOGIN_PATHNAME } from '@/constants/index.tsx';
 import { Link, useNavigate } from 'react-router-dom';
-import { useRequest } from 'ahooks';
-import { getUserInfoService } from '@/services/user.ts';
 import { UserOutlined } from '@ant-design/icons';
 import { Space, Dropdown, MenuProps, message } from 'antd';
 import { removeToken } from '@/utils/index.ts';
+import useGetUserInfo from '@/hooks/useGetUserInfo.ts';
+import { useAppDispatch } from '@/store/hooks/useAppDispatch.ts';
+import { logoutReducer } from '@/store/features/user/usersSlice.ts';
 
 const UserInfo: FC = () => {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { data } = useRequest(getUserInfoService);
-  const { username, nickname } = data || {};
+  const { username, nickname } = useGetUserInfo();
   const [messageApi, contextHolder] = message.useMessage();
 
   const items: MenuProps['items'] = [
@@ -24,6 +25,7 @@ const UserInfo: FC = () => {
 
   function handleLogout() {
     messageApi.success('Logout successfully, redirecting to login page...').then(() => {
+      dispatch(logoutReducer());
       removeToken();
       navigate(LOGIN_PATHNAME);
     });

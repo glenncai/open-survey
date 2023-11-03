@@ -1,13 +1,13 @@
 import { FC } from 'react';
-import useLoadSurveyData from '@/hooks/useLoadSurveyData.ts';
+// import useLoadSurveyData from '@/hooks/useLoadSurveyData.ts';
+// import Loading from '@/components/Loading/Loading.tsx';
 
 const Stat: FC = () => {
-  const { loading, data } = useLoadSurveyData();
+  // const { loading } = useLoadSurveyData();
 
   return (
     <div>
       <p>Stat Page</p>
-      {loading ? <p>loading...</p> : <p>{JSON.stringify(data)}</p>}
     </div>
   );
 };

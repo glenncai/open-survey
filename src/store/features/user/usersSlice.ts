@@ -8,7 +8,7 @@ export type UserStateType = {
 const initialState: UserStateType = { username: '', nickname: '' };
 
 export const usersSlice = createSlice({
-  name: 'user',
+  name: 'users',
   initialState,
   reducers: {
     loginReducer: (state, action: PayloadAction<UserStateType>) => {

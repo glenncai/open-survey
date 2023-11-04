@@ -1,6 +1,7 @@
 import styles from './index.module.scss';
 import { FC } from 'react';
 import useLoadSurveyData from '@/hooks/useLoadSurveyData.ts';
+import EditHeader from '@/pages/survey/edit/EditHeader/EditHeader.tsx';
 import EditCanvas from '@/pages/survey/edit/EditCanvas/EditCanvas.tsx';
 import LeftPanel from '@/pages/survey/edit/LeftPanel/LeftPanel.tsx';
 import RightPanel from '@/pages/survey/edit/RightPanel/RightPanel.tsx';
@@ -17,7 +18,9 @@ const Edit: FC = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.headerContainer}>Header</div>
+      <div className={styles.headerContainer}>
+        <EditHeader />
+      </div>
       <div className={styles.contentWrapper}>
         <div className={styles.content}>
           <div className={styles.left}>

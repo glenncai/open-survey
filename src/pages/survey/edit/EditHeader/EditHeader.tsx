@@ -3,6 +3,7 @@ import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Typography, Space } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
+import EditToolbar from '@/pages/survey/edit/EditToolbar/EditToolbar';
 
 const { Title } = Typography;
 
@@ -25,7 +26,9 @@ const EditHeader: FC = () => {
             <Title level={1}>Survey Title</Title>
           </Space>
         </div>
-        <div className={styles.main}>Main</div>
+        <div className={styles.main}>
+          <EditToolbar />
+        </div>
         <div className={styles.right}>
           <Space>
             <Button type="default">Save</Button>

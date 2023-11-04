@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ComponentPropsType } from '@/components/SurveyComponents';
-import { insertNewComponent } from '@/store/utils.ts';
+import { calculateNextSelectedId, insertNewComponent } from '@/store/utils.ts';
 
 export type ComponentInfoType = {
   fe_id: string;
@@ -51,10 +51,26 @@ export const componentsSlice = createSlice({
         };
       }
     },
+    deleteSelectedComponent(state) {
+      const { selectedId: deletedId, componentList } = state;
+
+      // Recalculate the selectedId
+      state.selectedId = calculateNextSelectedId(deletedId, componentList);
+
+      const index = componentList.findIndex(component => component.fe_id === deletedId);
+      if (index > -1) {
+        componentList.splice(index, 1);
+      }
+    },
   },
 });
 
-export const { resetComponents, changeSelectedId, addComponent, changeComponentProps } =
-  componentsSlice.actions;
+export const {
+  resetComponents,
+  changeSelectedId,
+  addComponent,
+  changeComponentProps,
+  deleteSelectedComponent,
+} = componentsSlice.actions;
 
 export default componentsSlice.reducer;

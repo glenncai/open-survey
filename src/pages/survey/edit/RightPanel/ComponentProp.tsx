@@ -21,7 +21,7 @@ const ComponentProp: FC = () => {
 
   if (!selectedComponent) return <NoProp />;
 
-  const { type, props } = selectedComponent;
+  const { type, props, isHidden, isLocked } = selectedComponent;
 
   const componentConf = getComponentConfByType(type);
 
@@ -29,7 +29,7 @@ const ComponentProp: FC = () => {
 
   const { PropComponent } = componentConf;
 
-  return <PropComponent {...props} onChange={handleChangeProps} />;
+  return <PropComponent {...props} onChange={handleChangeProps} disabled={isLocked || isHidden} />;
 };
 
 export default ComponentProp;

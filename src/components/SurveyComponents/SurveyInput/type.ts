@@ -1,6 +1,7 @@
 export type SurveyInputPropsType = {
   title?: string;
   placeholder?: string;
+  disabled?: boolean;
   onChange?: (newProps: SurveyInputPropsType) => void;
 };
 

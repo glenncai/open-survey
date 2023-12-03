@@ -32,12 +32,13 @@ export const insertNewComponent = (state: ComponentStateType, newComponent: Comp
  * @returns the next selectedId
  */
 export const calculateNextSelectedId = (fe_id: string, componentList: ComponentInfoType[]) => {
-  const index = componentList.findIndex(c => c.fe_id === fe_id);
+  const visibleComponentList = componentList.filter(c => !c.isHidden);
+  const index = visibleComponentList.findIndex(c => c.fe_id === fe_id);
   if (index < 0) return '';
 
   // Recalculate the selectedId
   let newSelectedId = '';
-  const length = componentList.length;
+  const length = visibleComponentList.length;
   if (length <= 1) {
     // If there is only one component, then there is no component after it
     newSelectedId = '';
@@ -45,10 +46,10 @@ export const calculateNextSelectedId = (fe_id: string, componentList: ComponentI
     // If there are more than one component
     if (index + 1 === length) {
       // If the last component is deleted, select the previous one
-      newSelectedId = componentList[index - 1].fe_id;
+      newSelectedId = visibleComponentList[index - 1].fe_id;
     } else {
       // If the last component is not deleted, select the next one
-      newSelectedId = componentList[index + 1].fe_id;
+      newSelectedId = visibleComponentList[index + 1].fe_id;
     }
   }
 

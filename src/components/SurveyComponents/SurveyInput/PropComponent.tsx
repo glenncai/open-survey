@@ -3,7 +3,7 @@ import { Form, Input } from 'antd';
 import { SurveyInputPropsType } from '@/components/SurveyComponents/SurveyInput/type.ts';
 
 const PropComponent: FC<SurveyInputPropsType> = (props: SurveyInputPropsType) => {
-  const { title, placeholder, onChange } = props;
+  const { title, placeholder, disabled = false, onChange } = props;
   const [form] = Form.useForm();
 
   const handleFormValuesChange = () => {
@@ -19,6 +19,7 @@ const PropComponent: FC<SurveyInputPropsType> = (props: SurveyInputPropsType) =>
   return (
     <Form
       form={form}
+      disabled={disabled}
       layout="vertical"
       initialValues={{ title, placeholder }}
       onValuesChange={handleFormValuesChange}

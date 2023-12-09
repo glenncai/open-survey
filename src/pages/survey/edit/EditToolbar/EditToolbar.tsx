@@ -1,17 +1,25 @@
 import { FC } from 'react';
 import { Button, Space, Tooltip } from 'antd';
-import { DeleteOutlined, EyeInvisibleOutlined, LockOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  EyeInvisibleOutlined,
+  LockOutlined,
+  CopyOutlined,
+  BlockOutlined,
+} from '@ant-design/icons';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch.ts';
 import {
   deleteSelectedComponent,
   changeComponentHidden,
   toggleComponentLocked,
+  copySelectedComponent,
+  pasteCopiedComponent,
 } from '@/store/features/component/componentsSlice.ts';
 import useGetComponentInfo from '@/hooks/useGetComponentInfo.ts';
 
 const EditToolbar: FC = () => {
   const dispatch = useAppDispatch();
-  const { selectedId, selectedComponent } = useGetComponentInfo();
+  const { selectedId, selectedComponent, copiedComponent } = useGetComponentInfo();
   const { isLocked } = selectedComponent || {};
 
   // Delete the selected component
@@ -29,6 +37,16 @@ const EditToolbar: FC = () => {
     dispatch(toggleComponentLocked({ fe_id: selectedId }));
   };
 
+  // Copy the selected component
+  const handleCopy = () => {
+    dispatch(copySelectedComponent());
+  };
+
+  // Paste the copied component
+  const handlePaste = () => {
+    dispatch(pasteCopiedComponent());
+  };
+
   return (
     <Space>
       <Tooltip title="Delete">
@@ -43,6 +61,17 @@ const EditToolbar: FC = () => {
           icon={<LockOutlined />}
           type={isLocked ? 'primary' : 'default'}
           onClick={handleLock}
+        />
+      </Tooltip>
+      <Tooltip title="Copy">
+        <Button shape="circle" icon={<CopyOutlined />} onClick={handleCopy} />
+      </Tooltip>
+      <Tooltip title="Paste">
+        <Button
+          shape="circle"
+          icon={<BlockOutlined />}
+          disabled={copiedComponent === null}
+          onClick={handlePaste}
         />
       </Tooltip>
     </Space>

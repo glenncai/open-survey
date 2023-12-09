@@ -44,7 +44,7 @@ const useLoadSurveyData = () => {
     console.log(selectedId);
 
     // Save the componentList to the redux store.
-    dispatch(resetComponents({ componentList, selectedId }));
+    dispatch(resetComponents({ componentList, selectedId, copiedComponent: null }));
   }, [data, dispatch]);
 
   return { loading, error };

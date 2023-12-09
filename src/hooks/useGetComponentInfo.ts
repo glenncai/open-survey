@@ -3,7 +3,7 @@ import { useAppSelector } from '@/store/hooks/useAppSelector.ts';
 export const useGetComponentInfo = () => {
   const components = useAppSelector(state => state.components);
 
-  const { componentList = [], selectedId } = components;
+  const { componentList = [], selectedId, copiedComponent = null } = components;
 
   const selectedComponent = componentList.find(c => c.fe_id === selectedId);
 
@@ -11,6 +11,7 @@ export const useGetComponentInfo = () => {
     componentList,
     selectedId,
     selectedComponent,
+    copiedComponent,
   };
 };
 

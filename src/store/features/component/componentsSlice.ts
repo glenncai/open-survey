@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ComponentPropsType } from '@/components/SurveyComponents';
 import { calculateNextSelectedId, insertNewComponent } from '@/store/utils.ts';
+import cloneDeep from 'lodash.clonedeep';
+import { nanoid } from 'nanoid';
 
 export type ComponentInfoType = {
   fe_id: string;
@@ -14,11 +16,13 @@ export type ComponentInfoType = {
 export type ComponentStateType = {
   selectedId: string;
   componentList: ComponentInfoType[];
+  copiedComponent: ComponentInfoType | null;
 };
 
 const initialState: ComponentStateType = {
   selectedId: '',
   componentList: [],
+  copiedComponent: null,
 };
 
 export const componentsSlice = createSlice({
@@ -90,6 +94,23 @@ export const componentsSlice = createSlice({
         currentComponent.isLocked = !currentComponent.isLocked;
       }
     },
+    copySelectedComponent(state) {
+      const { selectedId, componentList = [] } = state;
+      const selectedComponent = componentList.find(component => component.fe_id === selectedId);
+      if (selectedComponent) {
+        state.copiedComponent = cloneDeep(selectedComponent);
+      }
+    },
+    pasteCopiedComponent(state) {
+      const { copiedComponent } = state;
+      if (copiedComponent) {
+        const newComponent = {
+          ...copiedComponent,
+          fe_id: nanoid(),
+        };
+        insertNewComponent(state, newComponent);
+      }
+    },
   },
 });
 
@@ -101,6 +122,8 @@ export const {
   deleteSelectedComponent,
   changeComponentHidden,
   toggleComponentLocked,
+  copySelectedComponent,
+  pasteCopiedComponent,
 } = componentsSlice.actions;
 
 export default componentsSlice.reducer;

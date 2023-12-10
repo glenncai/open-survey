@@ -1,6 +1,6 @@
 import { useAppSelector } from '@/store/hooks/useAppSelector.ts';
 
-export const useGetComponentInfo = () => {
+const useGetComponentInfo = () => {
   const components = useAppSelector(state => state.components);
 
   const { componentList = [], selectedId, copiedComponent = null } = components;

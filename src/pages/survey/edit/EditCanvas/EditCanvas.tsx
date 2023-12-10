@@ -5,6 +5,7 @@ import { getComponentConfByType } from '@/components/SurveyComponents';
 import { changeSelectedId, ComponentInfoType } from '@/store/features/component/componentsSlice.ts';
 import Loading from '@/components/Loading/Loading.tsx';
 import useGetComponentInfo from '@/hooks/useGetComponentInfo.ts';
+import useBindCanvasKeyPress from '@/hooks/useBindCanvasKeyPress.ts';
 import { useAppDispatch } from '@/store/hooks/useAppDispatch.ts';
 
 type EditCanvasType = {
@@ -15,6 +16,9 @@ const EditCanvas: FC<EditCanvasType> = (props: EditCanvasType) => {
   const dispatch = useAppDispatch();
   const { loading } = props;
   const { componentList, selectedId } = useGetComponentInfo();
+
+  // Bind key press event
+  useBindCanvasKeyPress();
 
   const getComponent = (componentInfo: ComponentInfoType) => {
     const { type, props } = componentInfo;
